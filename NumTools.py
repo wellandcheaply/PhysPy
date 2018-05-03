@@ -1,6 +1,4 @@
 from random import randint as rd
-import time as t
-
 
 class Vec:
 	def __init__(self, values):
@@ -35,8 +33,18 @@ class Vec:
 
 	def __repr__(self): return str(self.vals)
 
+
+	'''
+	define the behavior of calling len() on a 
+	'''
 	def __len__(self): return len(self.vals)
 
+
+	'''
+	define the behavior of the symbol + as it applied to Vec objects
+	perform standard vector addition
+	return a Vec object
+	'''
 	def __add__(self, other):
 		if type(other) is int or type(other) is float:
 			return Vec([x + other for x in self.vals])
@@ -67,6 +75,11 @@ class Vec:
 				"Can only subtract type int, float, or Vec from Vec"
 			)
 
+	'''
+	define the behavior of the symbol * as it applies to Vec objects
+	return dot product Vec object if both arguments are of type Vec
+	return standard scalar multiple Vec object if one argument of type int or float
+	'''
 	def __mul__(self, other):
 		if type(other) is int or type(other) is float:
 			return Vec([x * other for x in self.vals])
@@ -106,19 +119,22 @@ class Vec:
 				"Divisor must be of type int or type Vec (for dot quotient)"
 			)
 
-	def __pow__(self, power, modulo=None):
-		return Vec([x ** power for x in self.vals])
+	'''
+	define the behavior of the symbol ** as it applied to Vec objects.
+	syntax must take the form: <Vec> ** int_or_float : rather than the form : int_or_float ** <Vec>
+	return a Vec object wherein each value of the calling vector has been raised to the passed power
+	'''
+	def __pow__(self, power): return Vec([x ** power for x in self.vals])
 
-	def __mod__(self, modulo):
-		return Vec([x % modulo for x in self.vals])
+	def __mod__(self, modulo): return Vec([x % modulo for x in self.vals])
 
 	def __iter__(self):
 		for index in range(len(self.vals)):
 			yield self.vals[index]
 
 	'''
-	Resets self.x/y/z/t after a change
-	Called by a couple other functions (setVals, remove)
+	reset self.x/y/z/t after a change
+	called by a couple other functions (setVals, remove)
 	'''
 	def coors(self):
 		if len(self.vals) >= 1:
@@ -131,13 +147,14 @@ class Vec:
 						self.t = self.vals[3]
 
 	# You're not writing java, jojo. Calm down.
-	def getVals(self):
-		toReturn = [x for x in self.vals]
-		return toReturn
+	def getVals(self): return [x for x in self.vals]
+
 
 	'''
-	This is handy though, as ypassing it by declaring Vec.vals = list(newVals) will fail to reset vec's "coordinates"
-	Calling self.x/y/z/t would erroneously return the old value afterward
+	this is handy though, as bypassing it ...
+		[i.e. declaring Vec.vals = list(newVals) ] 
+	... will fail to reset vec's "coordinates" 
+	calling self.x/y/z/t would erroneously return the old value afterward
 	'''
 	def setVals(self, vals):
 		self.vals = vals
@@ -165,7 +182,10 @@ class Vec:
 	# Vec unit vector
 	def unit(self): return Vec((self / self.mag()).vals)
 
-	# Vec dot product
+	'''
+	perform standard vector dot product operation
+	return an int or float object
+	'''
 	def dot(self, other):
 		if len(self.vals) != len(other.vals):
 			raise ArithmeticError(
@@ -174,7 +194,10 @@ class Vec:
 		else:
 			return sum([self.vals[x] * other.vals[x] for x in range(len(self))])
 
-	# Vec cross product
+	'''
+	perform standard vector cross product operation - only valid for vectors of length 3
+	return a Vec object
+	'''
 	def cross(self, other):
 		if type(other) is not Vec or not (self.__len__() == 3 and len(other) == 3):
 			raise ArithmeticError(
@@ -194,6 +217,10 @@ class Matrix:
 		self.isSquare = self.rows == self.cols
 		self.vecs = vecs
 
+	'''
+	define the behavior of the syntax <object>[someIndex] as it applies to Matrix objects
+	return a Vec object: the _row_ of the matrix at that index.
+	'''
 	def __getitem__(self, item):
 		if type(item) is int:
 			return self.vecs[item]
@@ -202,6 +229,9 @@ class Matrix:
 				"Indexing is only supported for integer indicies."
 			)
 
+	'''
+	define the behavior of the symbol = as it applies to a Matrix
+	'''
 	def __eq__(self, other):
 		if type(other) is not Matrix:
 			return False
@@ -212,23 +242,46 @@ class Matrix:
 			return True
 		else: return False
 
+	'''
+	define the behavior of calling len(<object>) on a Matrix.
+	'''
 	def __len__(self):
 		return [self.rows, self.cols]
 
+	'''
+	define the behavior of calling print(<object>) on a Matrix
+	'''
 	def __repr__(self):
 		toReturn = ""
 		for vec in self.vecs:
 			toReturn += str(vec.vals) + '\n'
 		return toReturn
 
-	def __mul__(self, other):
-		if type(other) not in [int, float]:
+	'''
+	define the behavior of the symbol * as it relates to a Matrix
+	
+	multiply all values in the matrix by a passed multiplier multiplier must be a scalar of type int or float
+	complex functionality to come in the future
+	
+	NOTE: the matrix must come first;
+		<Matrix> * 5 works.
+		5 * <Matrix> does not. 
+	
+	return a Matrix object
+	'''
+	def __mul__(self, multiplier):
+		if type(multiplier) not in [int, float]:
 			raise ArithmeticError(
 				"Multiply not supported for non-scalars"
 			)
 		else:
-			return Matrix([Vec([other*x for x in vec]) for vec in self.vecs])
+			return Matrix([Vec([multiplier*x for x in vec]) for vec in self.vecs])
 
+	'''
+	get the row of at the given index 
+	NOTE: the row said in mathematics to be row #1 would be returned by passing 0 to this function, etc
+	return a Vec object
+	'''
 	def row(self, index):
 		if type(index) is int:
 			return self.__getitem__(index)
@@ -237,6 +290,11 @@ class Matrix:
 				"Indexing is only supported for integer indicies"
 			)
 
+	'''
+	get the column of at the given index 
+		(note: the column said in mathematics to be column #1 would be returned by passing 0 to this function, etc)
+	return a Vec object
+	'''
 	def col(self, index):
 		if type(index) is int:
 			return Vec([vec[index] for vec in self.vecs])
@@ -248,33 +306,42 @@ class Matrix:
 	def array(self):
 		return [[val for val in row.getVals()] for row in self.vecs]
 
+	'''
+	return a matrix which is the transpose of the calling object.
+	the transpose of a matrix is just its reflection about the long North-West to South-East diagonal.
+	'''
 	def T(self):
 		return Matrix([Vec([self.vecs[j].vals[i] for j in range(len(self.vecs))]) for i in range(len(self.vecs[0].vals))])
 
+	'''
+	a matrix is symmetric if it's equal to its transposition
+	return True/False
+	'''
 	def isSymmetric(self):
 		return self == self.T()
 
+	'''
+	a matrix is skew if it's equal to the negation of its transposition
+	return True/False
+	'''
 	def isSkew(self):
 		return self.__mul__(-1) == self.T()
 
 	'''
-	A hilarious single-line masterpiece of Generator-foo
+	a hilarious single-line masterpiece of Generator-foo
 	
-	Returns a Matrix which is the dot product of the calling Matrix and the passed one. 
+	return a Matrix which is the dot product of the calling Matrix and the passed one. 
 	or
-	Throws an ArithmeticError if the two matrices are of incompatible dimensions.
+	throw an ArithmeticError if the two matrices are of incompatible dimensions.
 	'''
 	def dot(self, other):
 		return Matrix([Vec([sum([row.vals[i] * col[i] for i in range(len(self.vecs[0].vals))]) for col in [[rowT.vals[j] for rowT in other.vecs] for j in range(len(self.vecs[0].vals))]]) for row in self.vecs]) if self.cols == other.rows else ArithmeticError("Matrix Multiplication A.dot(B) only valid if the number of columns in A is equal to the number of rows in B.")
 
 	'''
-	This was written for the slow-ass function below now known as <Matrix.det2()>
-	It might be handy somewhere else, but I dunno.
+	this was written for the slow-ass function below now known as <Matrix.det2()>
+	it might be handy somewhere else, but I dunno.
 	
-	Args
-		index (int)
-	
-	Returns a matrix just like the calling one,
+	return a matrix just like the calling one,
 	except missing row 0 and column <index>
 	'''
 	def trim(self, index):
@@ -285,8 +352,8 @@ class Matrix:
 		return Matrix(keepRows)
 
 	'''
-	Returns True/False
-	Does what it says on the tin
+	does what it says on the tin
+	return True/False
 	'''
 	def isEschelon(self):
 		t = self.T()
@@ -297,9 +364,9 @@ class Matrix:
 		return True
 
 	'''
-	Find the determinant of a square matrix
-	First, find its non-reduced row-eschelon form
-	Then multiply accross the main diagonal
+	find the determinant of a square matrix
+	first find its non-reduced row-eschelon form
+	then multiply accross the main diagonal
 	'''
 	def det(self):
 		if not self.isSquare:
@@ -343,18 +410,12 @@ class Matrix:
 		return int(round(total))  # (this works fine up to ~14/15-digit determinants)
 
 	'''
-	This method is extremely slow at finding the determinant for large matrices.
-	For 2x2 and 3x3 matrices, it's negligibly faster.
-	It was a noble first attempt, really didn't make the cut
+	this method is extremely slow at finding the determinant for large matrices.
+	for 2x2 and 3x3 matrices, it's negligibly faster.
+	it was a noble first attempt, really didn't make the cut
 	
-	Even in the (relatively) tame case of an 8x8 matrix, the <Matrix.det()> method
-	above is 1000-2000 times faster. 
-	
-	It's really long and ugly, so I've included line-commented block comments top and bottom for if you hate it.
-	Or just delete it tbh
-	Ugh
+	even in the (relatively) tame case of an 8x8 matrix, the <Matrix.det()> method above is ___ 500-2500 times faster ___.
 	'''
-	#'''
 	def det2(self):
 		
 		def det2x2():
@@ -406,7 +467,6 @@ class Matrix:
 				total += rowI[x]*self.trim(x).det() if add else -1*rowI[x]*self.trim(x).det()
 				add = not add
 			return total
-	#'''
 
 	# TODO: A third determinant function (Leibniz formual - should be very fast) is still coming along
 	# TODO: Matrix still won't give you RowEschelon form or do much elimination.
