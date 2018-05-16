@@ -1,5 +1,6 @@
 from random import randint as rd
-from math import floor, ceil, sqrt
+from PhysPy.PhysicalConstants import *
+from math import floor, ceil, sqrt, log, factorial
 
 class Vec:
 
@@ -691,6 +692,7 @@ class Matrix:
 	# TODO: Matrix still doesn't handle complex numbers, and I honestly don't even want to think about that.
 	# TODO: ^^^ Probably warrants it whole own class rather than much change to this one.
 
+
 def I(n):
 	identity = []
 	for rowDex in range(n):
@@ -715,6 +717,15 @@ def random_square_matrix(n):
 		toReturn += '\n'
 	toReturn += "])"
 	return toReturn
+
+
+def deg(rads):
+	return (rads*360)/(2*pi)
+
+
+def rad(deg):
+	ratio = deg/360
+	return ratio*2*pi
 
 '''
 eight = Matrix([Vec([10, 5, 27, 0, 0, 0, 50, 24]),

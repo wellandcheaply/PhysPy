@@ -7,5 +7,7 @@ CC = 9e+9  # Coulomb's Constant: N m^2 A^-2 s^-4
 h = 6.626e-24  # J.s (Planck constant; do not confuse w/ h_bar)
 hbar = 1.0546e-34  # J.s ( = h/2pi )
 pi = 3.14159265358979323846  # Ratio of Circumerence to Diameter of a Circle
+e = 2.718281828459045
 kb = 1.3807e-23  # Boltzmann Constant
+
 

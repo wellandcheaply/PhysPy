@@ -1,8 +1,8 @@
-import math as m
 from PhysPy.NumTools import *
 from PhysPy.PhysicalConstants import *
 import decimal as d
 d.getcontext().prec = 50
+
 
 class Object:
 	def __init__(self, position=Vec([0, 0, 0]), mass=0, velocity=Vec([0, 0, 0]), w=0):
@@ -33,6 +33,7 @@ class Sphere(Object):
 		self.I = (self.R**2 * self.m * 2 / 5)  # describes a sphere of uniform density only
 		self.L = self.I * self.w
 
+
 class Disk(Object):
 	def __init__(
 			self,
@@ -44,6 +45,7 @@ class Disk(Object):
 		self.R = radius
 		self.I = self.R**2 * self.m / 2
 		self.L = self.I * self.w
+
 
 class Rod(Object):
 	def __init__(
@@ -105,6 +107,7 @@ class Particle:
 
 	def rest(self):
 		return self.m * c**2
+
 
 class Atom:
 	def __init__(
@@ -172,6 +175,7 @@ class Spring:
 			self.dl = dl
 		else:
 			self.dl += dl
+
 
 class Planet:
 	def __init__(
