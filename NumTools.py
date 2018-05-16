@@ -1,56 +1,161 @@
 from random import randint as rd
+from math import floor, ceil, sqrt
 
 class Vec:
+
+	# TODO: class Vec() is pretty much done for the moment, so that's good.
+
 	def __init__(self, values):
 		self.vals = values
-		if len(self.vals) >= 1:
+		if len(self) >= 1:
 			self.x = values[0]
-			if len(self.vals) >= 2:
+			if len(self) >= 2:
 				self.y = values[1]
-				if len(self.vals) >= 3:
+				if len(self) >= 3:
 					self.z = values[2]
-					if len(self.vals) >= 4:
+					if len(self) >= 4:
 						self.t = values[3]
 
-	# TODO: class Vec() still has some magic methods that need overwriting, but it gets the job done.
-
+	# define the syntax Vec(x) == Vec(y)
 	def __eq__(self, other):
+		'''
+		:param other: a Vec() object to be compared
+		:return:
+			True if the ordered values of the calling Vec object
+			are identical to those of the passed Vec object
+			False otherwise
+		'''
 		if type(other) is Vec:
-			if self.__len__() == len(other):
-				for x in range(self.__len__()):
-					if self[x] != other[x]:
-						return False
-				return True
+			return self.vals == other.vals
 		return False
 
-	def __getitem__(self, item):
-		if(type(item) is int):
-			return self.vals[item]
-		else:
-			raise ArithmeticError(
-				"Indexing is only supported for integer indices"
-			)
+	# define the syntax Vec(x) != Vec(y)
+	def __ne__(self, other):
+		'''
+		:param other: a Vec() object to be compared
+		:return:
+			False if the ordered values of the calling Vec object
+			are identical to those of the passed Vec object
+			True otherwise
+		'''
+		if type(other) is Vec:
+			return self.vals != other.vals
+		return True
 
-	def __repr__(self): return str(self.vals)
+	# define the syntax Vec(x) < Vec(y)
+	def __lt__(self, other):
+		'''
+		:param other: a Vec() object to be compared
+		:return:
+			True if the magnitude of <self> is
+			less than to the magnitude of <other>
+			False otherwise
+		'''
+		if type(other) is Vec:
+			return self.mag() < other.mag()
+		raise ArithmeticError(
+			"Cannot compare objects of two different types"
+		)
 
+	# define the syntax Vec(x) > Vec(y)
+	def __gt__(self, other):
+		'''
+		:param other: a Vec() object to be compared
+		:return:
+			True if the magnitude of <self> is
+			greater than the magnitude of <other>
+			False otherwise
+		'''
+		if type(other) is Vec:
+			return self.mag() > other.mag()
+		raise ArithmeticError(
+			"Cannot compare objects of two different types"
+		)
 
-	'''
-	define the behavior of calling len() on a 
-	'''
-	def __len__(self): return len(self.vals)
+	# define the syntax Vec(x) <= Vec(y)
+	def __le__(self, other):
+		'''
+		:param other: a Vec() object to be compared
+		:return:
+			True if the magnitude of <self> is
+			less than or equal to the magnitude of <other>
+			False otherwise
+		'''
+		if type(other) is Vec:
+			return self.mag() <= other.mag()
+		raise ArithmeticError(
+			"Cannot compare objects of two different types"
+		)
 
+	# define the syntax Vec(x) >= Vec(y)
+	def __ge__(self, other):
+		'''
+		:param other: a Vec() object to be compared
+		:return:
+			True if the magnitude of <self> is
+			greater than or equal to the magnitude of <other>
+			False otherwise
+		'''
+		if type(other) is Vec:
+			return self.mag() >= other.mag()
+		raise ArithmeticError(
+			"Cannot compare objects of two different types"
+		)
 
-	'''
-	define the behavior of the symbol + as it applied to Vec objects
-	perform standard vector addition
-	return a Vec object
-	'''
+	# define the syntax -Vec(x) as returning an equal and opposite vector
+	def __neg__(self):
+		return Vec([-x for x in self])
+
+	# define the syntax ~Vec(x) as returning the reverse of the vector (no longer a bit op)
+	def __invert__(self):
+		return Vec(self.vals[::-1])
+
+	# define the int(Vec(x)) function
+	def __int__(self):
+		# return a copy of the valling vector wherein all values are rounded down to the nearest integer
+		return Vec([int(x) for x in self])
+
+	# define the round(Vec(x), n) function
+	def __round__(self, n):
+		'''
+		:param n: the number of decimal places to round to
+		:return:
+			a copy of the passed Vec() object with
+			each of its values rounded to n decimal places
+		'''
+		return Vec([round(x, n) for x in self])
+
+	# define the math.floor(Vec(x)) function
+	def __floor__(self):
+		return Vec([floor(x) for x in self])
+
+	# define the math.ceil(Vec(x)) function
+	def __ceil__(self):
+		return Vec([ceil(x)] for x in self)
+
+	# define the behavior of calling print() on a
+	def __repr__(self):
+		return str(self.vals)
+
+	# define the behavior of calling len() on a
+	def __len__(self):
+		return len(self.vals)
+
+	# define the behavior of the symbol + as it applies to Vec objects
 	def __add__(self, other):
+		'''
+		:param other: an object of type int, float, or Vec to be added
+		:return:
+			if other is of type Vec:
+				the result of the vector addition of the two vectors
+			if other is of type int or float:
+				the result of adding other to each value in the calling vector
+		'''
 		if type(other) is int or type(other) is float:
-			return Vec([x + other for x in self.vals])
+			return Vec([x + other for x in self])
 		elif type(other) is Vec:
-			if len(self.vals) == len(other.vals):
-				return Vec([self.vals[x] + other.vals[x] for x in range(len(self))])
+			if self.__len__() == len(other):
+				return Vec([self[x] + other[x] for x in range(len(self))])
 			else:
 				raise ArithmeticError(
 					"Arrays must be the same length to add them"
@@ -60,12 +165,21 @@ class Vec:
 				"Can only add Vec to type int, float, or Vec"
 			)
 
+	# define the behavior of the symbol - as it applies to Vec objects
 	def __sub__(self, other):
+		'''
+		:param other: an object of type int, float, or Vec to be subtracted
+		:return:
+			if other is of type Vec:
+				the result of subtracting other from the calling vector
+			if other is of type int or float:
+				the result of subtrcating other from each value in the calling vector
+		'''
 		if type(other) is int or type(other) is float:
-			return Vec([x - other for x in self.vals])
+			return Vec([x - other for x in self])
 		elif type(other) is Vec:
-			if len(self.vals) == len(other.vals):
-				return Vec([self.vals[x] - other.vals[x] for x in range(len(self))])
+			if len(self) == len(other):
+				return Vec([self[x] - other[x] for x in range(len(self))])
 			else:
 				raise ArithmeticError(
 					"Arrays must be the same length to subtract them"
@@ -75,16 +189,20 @@ class Vec:
 				"Can only subtract type int, float, or Vec from Vec"
 			)
 
-	'''
-	define the behavior of the symbol * as it applies to Vec objects
-	return dot product Vec object if both arguments are of type Vec
-	return standard scalar multiple Vec object if one argument of type int or float
-	'''
+	# define the behavior of the symbol * as it applies to Vec objects
 	def __mul__(self, other):
+		'''
+		:param other: an object of type int, float, or Vec by which to multiply
+		:return:
+			if other is of type Vec:
+				the dot product of the two vectors
+			if other is of type int or float:
+				the result of scalar multiplication of the calling vector by other
+		'''
 		if type(other) is int or type(other) is float:
-			return Vec([x * other for x in self.vals])
+			return Vec([x * other for x in self])
 		elif type(other) is Vec:
-			if len(self.vals) == len(other.vals):
+			if len(self) == len(other):
 				return self.dot(other)
 			else:
 				raise ArithmeticError(
@@ -95,21 +213,31 @@ class Vec:
 				"Multiplier must be of type int or type Vec (for dot product)"
 			)
 
+	# define the behavior of the symbol / as it applies to Vec() objects
 	def __truediv__(self, other):
+		'''
+		:param other: an object of type int, float, or Vec by which to divide
+		:return:
+			if other is of type int or float:
+				the result of scalar vision of each value in self.vals by other
+			if other is of type Vec:
+				the result of the 'dot division' of the two vectors
+		'''
 		if type(other) is int or type(other) is float:
 			if other != 0:
-				return Vec([x / other for x in self.vals])
+				return Vec([x / other for x in self])
 			else:
 				raise ArithmeticError(
 					"Cannot divide by 0"
 				)
 		elif type(other) is Vec:
-			if len(other.vals) == len(self.vals):
+			if len(self) == len(other):
 				if 0 not in other.vals:
-					return sum([self.vals[x] / other.vals[x] for x in range(len(self))])
+					return sum([self[x] / other[x] for x in range(len(self))])
 				else:
-					raise (ArithmeticError(
-						"Cannot divide by 0"))
+					raise ArithmeticError(
+						"Cannot divide by 0"
+					)
 			else:
 				raise ArithmeticError(
 					"Vectors must be the same length to take the dot quotient"
@@ -119,48 +247,106 @@ class Vec:
 				"Divisor must be of type int or type Vec (for dot quotient)"
 			)
 
-	'''
-	define the behavior of the symbol ** as it applied to Vec objects.
-	syntax must take the form: <Vec> ** int_or_float : rather than the form : int_or_float ** <Vec>
-	return a Vec object wherein each value of the calling vector has been raised to the passed power
-	'''
-	def __pow__(self, power): return Vec([x ** power for x in self.vals])
+	# define the behavior of the symbol ** as it applies to Vec() objects.
+	def __pow__(self, power):
+		'''
+		syntax must take the form
+			<Vec> ** int_or_float
+		rather than the form
+			int_or_float ** <Vec>
 
-	def __mod__(self, modulo): return Vec([x % modulo for x in self.vals])
+		:param power: the power to which to raise each value
+		:return:
+			a Vec() object wherein each value of the
+			calling vector has been raised to the passed power
+		'''
+		return Vec([x ** power for x in self])
 
+	# define the behavior of the symbol % as it applies to Vec() objects.
+	def __mod__(self, modulo):
+		'''
+		:param modulo: the argument of the mathematical mod() function
+		:return:
+			the remainder of each value in <some Vec()>.vals after division by <modulo>
+		'''
+		return Vec([x % modulo for x in self])
+
+	# define the behavior of the keyword 'in' as it applies to Vec() objects
+	def __contains__(self, item):
+		'''
+		(i.e. ' for x in <some Vec()>: ... ' )
+		:param item: the item to be searched for in <some Vec()>.vals
+		:return:
+			True if the x is a value in <some Vec()>.vals
+			else False
+		'''
+		return item in self.vals
+
+	# define the behavior of list indexing syntax as it applies to Vec() objects.
+	def __getitem__(self, index):
+		'''
+		(i.e. ' var = <some Vec()>[index] ' )
+
+		:param index: the index of the item to be returned
+		:return: the item at <index> in <some Vec()>.vals
+		'''
+		if(type(index) is int):
+			return self.vals[index]
+		else:
+			raise ArithmeticError(
+				"Indexing is only supported for integer indices"
+			)
+
+	# define the behavior of the keyphrase 'for i in' as it applies to Vec() objects
 	def __iter__(self):
-		for index in range(len(self.vals)):
-			yield self.vals[index]
+		'''
+		(i.e. ' for x in <some Vec()>: ... ' )
+		iterate through the list <some Vec()>.vals and yield each value
+		'''
+		for index in range(len(self)):
+			yield self[index]
 
-	'''
-	reset self.x/y/z/t after a change
-	called by a couple other functions (setVals, remove)
-	'''
 	def coors(self):
-		if len(self.vals) >= 1:
-			self.x = self.vals[0]
-			if len(self.vals) >= 2:
-				self.y = self.vals[1]
-				if len(self.vals) >= 3:
-					self.z = self.vals[2]
-					if len(self.vals) >= 4:
-						self.t = self.vals[3]
+		'''
+		reset self.x/y/z/t after a change
+		called by a few other functions (setVals, append, remove) but should otherwise probably be treated as 'private'
+		'''
+		if len(self) >= 1:
+			self.x = self[0]
+			if len(self) >= 2:
+				self.y = self[1]
+				if len(self) >= 3:
+					self.z = self[2]
+					if len(self) >= 4:
+						self.t = self[3]
 
-	# You're not writing java, jojo. Calm down.
-	def getVals(self): return [x for x in self.vals]
-
-
-	'''
-	this is handy though, as bypassing it ...
-		[i.e. declaring Vec.vals = list(newVals) ] 
-	... will fail to reset vec's "coordinates" 
-	calling self.x/y/z/t would erroneously return the old value afterward
-	'''
 	def setVals(self, vals):
+		'''
+		set the values of the calling vector to the passed values without creating a new Vec object
+
+		this function should be used in place of syntax such as <some Vec()>.vals = new_vals
+		as that would fail to reset the Vec object's "coordinates" whereafter
+		calling self.x/y/z/t would erroneously return the old values
+
+		:param vals: object of type list containing real values
+		'''
 		self.vals = vals
 		self.coors()
 
-	# Removes an item and
+	# append the item to the vector at the given optional index and update the vectors coordinate syntax
+	def append(self, value, index=None):
+		if index is None:
+			self.vals.append(value)
+
+		elif type(index) is int:
+			self.vals.append(value, index)
+		else:
+			raise ArithmeticError(
+				"Indexing is only supported for integer indices"
+			)
+		self.coors()
+
+	# remove the item at the passed index and refactors the vector's coordinate synatx
 	def remove(self, index):
 		if type(index) is int:
 			self.vals.remove(index)
@@ -170,36 +356,64 @@ class Vec:
 				"Indexing is only supported for integer indices"
 			)
 
-	# I have no idea why anyone would want this
-	def total(self): return sum(self.vals)
+	# return the sum of all values in the calling Vec() object
+	def total(self):
+		return sum(self.vals)
 
-	# This is a handy overlap though
-	def sum(self, other): return self.__add__(other)
+	# return the result of self + other ... just a handy redundancy, really
+	def sum(self, other):
+		return self + other
 
-	# Float magnitude
-	def mag(self): return sum([x ** 2 for x in self.vals]) ** (1 / 2)
+	# return the magnitude of the calling Vec() object
+	def mag(self):
+		return (self**2).total()**(1/2)
 
-	# Vec unit vector
-	def unit(self): return Vec((self / self.mag()).vals)
+	# return the Vec representation of the unit vector of the calling Vec() object
+	def unit(self):
+		return Vec((self / self.mag()).vals)
 
-	'''
-	perform standard vector dot product operation
-	return an int or float object
-	'''
+	# return the straight-line distance between two vectors
+	def dist(self, other):
+		difference = self - other
+		return (difference**2).total()**(1/2)
+
+	# return the slope between the Vec() representation of two points
+	def slope(self, other):
+		'''
+		:param r1: the Vec() representation of one point
+		:param r2: the Vec() representation of another point
+		:return:
+			if r1 and r2 in R^2:
+				float(dy/dx)
+			else: (ex. r1 and r2 in R^4)
+				Vec([dy/dx, dz/dx, dt/dx, dz/dy, dt/dy, dt/dz])
+		'''
+		if len(self) == len(other):
+			dr = self - other
+			toReturn = Vec([[dr[numer]/dr[denom] for numer in range(denom+1, len(other))] for denom in range(len(other)-1)])
+			if len(toReturn) == 1:
+				return toReturn[0]
+			else:
+				return Vec(toReturn)
+
 	def dot(self, other):
-		if len(self.vals) != len(other.vals):
+		'''
+		perform standard vector dot product operation
+		return an int or float object
+		'''
+		if len(self) == len(other):
+			return sum([self[x] * other[x] for x in range(len(self))])
+		else:
 			raise ArithmeticError(
 				"Arrays must be the same length to take the dot product."
 			)
-		else:
-			return sum([self.vals[x] * other.vals[x] for x in range(len(self))])
 
-	'''
-	perform standard vector cross product operation - only valid for vectors of length 3
-	return a Vec object
-	'''
 	def cross(self, other):
-		if type(other) is not Vec or not (self.__len__() == 3 and len(other) == 3):
+		'''
+		perform standard vector cross product operation - only valid for vectors of length 3
+		return a Vec object
+		'''
+		if type(other) is not Vec or not (len(self) == 3 and len(other) == 3):
 			raise ArithmeticError(
 				"Can only take cross product of two 3-dimensional vectors."
 			)
@@ -209,11 +423,11 @@ class Vec:
 			c = self.x*other.y - self.y*other.x
 			return Vec([a,b,c])
 
-class Matrix:
 
+class Matrix:
 	def __init__(self, vecs):
 		self.rows = len(vecs)
-		self.cols = len(vecs[0].vals)
+		self.cols = len(vecs[0])
 		self.isSquare = self.rows == self.cols
 		self.vecs = vecs
 
@@ -237,10 +451,11 @@ class Matrix:
 			return False
 		elif self.rows == other.rows and self.cols == other.cols:
 			for x in range(self.rows):
-				if(self.__getitem__(x) != other[x]):
+				if(self[x] != other[x]):
 					return False
 			return True
-		else: return False
+		else:
+			return False
 
 	'''
 	define the behavior of calling len(<object>) on a Matrix.
@@ -486,35 +701,22 @@ def I(n):
 	return Matrix(identity)
 
 
-def generateSquare(n):
+def random_square_matrix(n):
 	rows = []
 	for rowDex in range(n):
 		row = []
 		for colDex in range(n):
 			row.append(rd(0,50))
 		rows.append(Vec(row))
-	return Matrix(rows)
+	#return Matrix(rows)
+	toReturn = "Matrix(["
+	for x in rows:
+		toReturn += "Vec({}), ".format(str(x.vals))
+		toReturn += '\n'
+	toReturn += "])"
+	return toReturn
 
 '''
-Some tests / matricies I might use again
-
-four = Matrix([Vec([20, 44, 15, 5]),
-			   Vec([42, 48, 18, 33]),
-			   Vec([2, 24, 4, 32]),
-			   Vec([44, 38, 8, 30])])
-
-five = Matrix([Vec([0,17,2,3,4]),
-			   Vec([5,6,7,8,9]),
-			   Vec([10,11,12,13,14]),
-			   Vec([15,16,17,18,19]),
-			   Vec([20,21,22,23,24])])
-			   
-five2 = Matrix([Vec([0,17,2,3,4]),
-				Vec([5,6,7,7,7]), 
-				Vec([13,22,7,7,27]), 
-				Vec([14,44,2,3,2]), 
-				Vec([11,5,1,6,1])])
-
 eight = Matrix([Vec([10, 5, 27, 0, 0, 0, 50, 24]),
 				Vec([0, 38, 15, 28, 5, 7, 37, 2]),
 				Vec([25, 40, 6, 12, 1, 18, 14, 11]),
@@ -523,21 +725,8 @@ eight = Matrix([Vec([10, 5, 27, 0, 0, 0, 50, 24]),
 				Vec([11, 9, 40, 38, 49, 19, 29, 12]),
 				Vec([24, 1, 6, 21, 23, 1, 3, 27]),
 				Vec([34, 27, 47, 10, 13, 3, 40, 44])])
-'''
-
-'''
-This 8x8 of randomly generated values on [0,50] gave me 3 0's in a row.
-It was the first matrix of any size I generated randomly!
-That's freakishly unlikely. 
-
-[10, 5, 27, 0, 0, 0, 50, 24]
-[0, 38, 15, 28, 5, 7, 37, 2]
-[25, 40, 6, 12, 1, 18, 14, 11]
-[48, 25, 23, 15, 36, 35, 28, 5]
-[27, 46, 30, 2, 20, 26, 32, 40]
-[11, 9, 40, 38, 49, 19, 29, 12]
-[24, 1, 6, 21, 23, 1, 3, 27]
-[34, 27, 47, 10, 13, 3, 40, 44]
-
-I shall investigate the properties of random.randint()'s default seed.
+				
+# 100x100 build time for random integer values on [0-50]: 0.1216 seconds
+# Determinate of this matrix: 2284784652856255376675472288673118509546940811228880101478350821136420519792329633542833866718250902178657390136472868306416933282144585097519677731018847322252582918455804482975457776361216671744
+# Jesus, you could put someone's eye out with that thing.
 '''
